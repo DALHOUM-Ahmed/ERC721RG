@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 // OpenZeppelin Contracts (last updated v4.7.0) (token/ERC721/ERC721.sol)
 
-//0x884dFe83D0183fCDaA711D484aE6D4983f23AA58
-
 pragma solidity ^0.8.0;
 
 interface IERC165 {
@@ -17,33 +15,190 @@ interface IERC165 {
   function supportsInterface(bytes4 interfaceId) external view returns (bool);
 }
 
+/**
+ * @dev Wrappers over Solidity's arithmetic operations with added overflow
+ * checks.
+ *
+ * Arithmetic operations in Solidity wrap on overflow. This can easily result
+ * in bugs, because programmers usually assume that an overflow raises an
+ * error, which is the standard behavior in high level programming languages.
+ * `SafeMath` restores this intuition by reverting the transaction when an
+ * operation overflows.
+ *
+ * Using this library instead of the unchecked operations eliminates an entire
+ * class of bugs, so it's recommended to use it always.
+ */
+
+library SafeMath {
+  /**
+   * @dev Returns the addition of two unsigned integers, reverting on
+   * overflow.
+   *
+   * Counterpart to Solidity's `+` operator.
+   *
+   * Requirements:
+   *
+   * - Addition cannot overflow.
+   */
+  function add(uint256 a, uint256 b) internal pure returns (uint256) {
+    uint256 c = a + b;
+    require(c >= a, "SafeMath: addition overflow");
+
+    return c;
+  }
+
+  /**
+   * @dev Returns the subtraction of two unsigned integers, reverting on
+   * overflow (when the result is negative).
+   *
+   * Counterpart to Solidity's `-` operator.
+   *
+   * Requirements:
+   *
+   * - Subtraction cannot overflow.
+   */
+  function sub(uint256 a, uint256 b) internal pure returns (uint256) {
+    return sub(a, b, "SafeMath: subtraction overflow");
+  }
+
+  /**
+   * @dev Returns the subtraction of two unsigned integers, reverting with custom message on
+   * overflow (when the result is negative).
+   *
+   * Counterpart to Solidity's `-` operator.
+   *
+   * Requirements:
+   *
+   * - Subtraction cannot overflow.
+   */
+  function sub(
+    uint256 a,
+    uint256 b,
+    string memory errorMessage
+  ) internal pure returns (uint256) {
+    require(b <= a, errorMessage);
+    uint256 c = a - b;
+
+    return c;
+  }
+
+  /**
+   * @dev Returns the multiplication of two unsigned integers, reverting on
+   * overflow.
+   *
+   * Counterpart to Solidity's `*` operator.
+   *
+   * Requirements:
+   *
+   * - Multiplication cannot overflow.
+   */
+  function mul(uint256 a, uint256 b) internal pure returns (uint256) {
+    // Gas optimization: this is cheaper than requiring 'a' not being zero, but the
+    // benefit is lost if 'b' is also tested.
+    // See: https://github.com/OpenZeppelin/openzeppelin-contracts/pull/522
+    if (a == 0) {
+      return 0;
+    }
+
+    uint256 c = a * b;
+    require(c / a == b, "SafeMath: multiplication overflow");
+
+    return c;
+  }
+
+  /**
+   * @dev Returns the integer division of two unsigned integers. Reverts on
+   * division by zero. The result is rounded towards zero.
+   *
+   * Counterpart to Solidity's `/` operator. Note: this function uses a
+   * `revert` opcode (which leaves remaining gas untouched) while Solidity
+   * uses an invalid opcode to revert (consuming all remaining gas).
+   *
+   * Requirements:
+   *
+   * - The divisor cannot be zero.
+   */
+  function div(uint256 a, uint256 b) internal pure returns (uint256) {
+    return div(a, b, "SafeMath: division by zero");
+  }
+
+  /**
+   * @dev Returns the integer division of two unsigned integers. Reverts with custom message on
+   * division by zero. The result is rounded towards zero.
+   *
+   * Counterpart to Solidity's `/` operator. Note: this function uses a
+   * `revert` opcode (which leaves remaining gas untouched) while Solidity
+   * uses an invalid opcode to revert (consuming all remaining gas).
+   *
+   * Requirements:
+   *
+   * - The divisor cannot be zero.
+   */
+  function div(
+    uint256 a,
+    uint256 b,
+    string memory errorMessage
+  ) internal pure returns (uint256) {
+    require(b > 0, errorMessage);
+    uint256 c = a / b;
+    // assert(a == b * c + a % b); // There is no case in which this doesn't hold
+
+    return c;
+  }
+
+  /**
+   * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+   * Reverts when dividing by zero.
+   *
+   * Counterpart to Solidity's `%` operator. This function uses a `revert`
+   * opcode (which leaves remaining gas untouched) while Solidity uses an
+   * invalid opcode to revert (consuming all remaining gas).
+   *
+   * Requirements:
+   *
+   * - The divisor cannot be zero.
+   */
+  function mod(uint256 a, uint256 b) internal pure returns (uint256) {
+    return mod(a, b, "SafeMath: modulo by zero");
+  }
+
+  /**
+   * @dev Returns the remainder of dividing two unsigned integers. (unsigned integer modulo),
+   * Reverts with custom message when dividing by zero.
+   *
+   * Counterpart to Solidity's `%` operator. This function uses a `revert`
+   * opcode (which leaves remaining gas untouched) while Solidity uses an
+   * invalid opcode to revert (consuming all remaining gas).
+   *
+   * Requirements:
+   *
+   * - The divisor cannot be zero.
+   */
+  function mod(
+    uint256 a,
+    uint256 b,
+    string memory errorMessage
+  ) internal pure returns (uint256) {
+    require(b != 0, errorMessage);
+    return a % b;
+  }
+}
+
 interface IERC721 is IERC165 {
   /**
    * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
    */
-  event Transfer(
-    address indexed from,
-    address indexed to,
-    uint256 indexed tokenId
-  );
+  event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
 
   /**
    * @dev Emitted when `owner` enables `approved` to manage the `tokenId` token.
    */
-  event Approval(
-    address indexed owner,
-    address indexed approved,
-    uint256 indexed tokenId
-  );
+  event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId);
 
   /**
    * @dev Emitted when `owner` enables or disables (`approved`) `operator` to manage all of its assets.
    */
-  event ApprovalForAll(
-    address indexed owner,
-    address indexed operator,
-    bool approved
-  );
+  event ApprovalForAll(address indexed owner, address indexed operator, bool approved);
 
   /**
    * @dev Returns the number of tokens in ``owner``'s account.
@@ -153,20 +308,14 @@ interface IERC721 is IERC165 {
    *
    * - `tokenId` must exist.
    */
-  function getApproved(uint256 tokenId)
-    external
-    view
-    returns (address operator);
+  function getApproved(uint256 tokenId) external view returns (address operator);
 
   /**
    * @dev Returns if the `operator` is allowed to manage all of the assets of `owner`.
    *
    * See {setApprovalForAll}
    */
-  function isApprovedForAll(address owner, address operator)
-    external
-    view
-    returns (bool);
+  function isApprovedForAll(address owner, address operator) external view returns (bool);
 }
 
 interface IERC721Receiver {
@@ -259,10 +408,7 @@ library Address {
     require(address(this).balance >= amount, "Address: insufficient balance");
 
     (bool success, ) = recipient.call{value: amount}("");
-    require(
-      success,
-      "Address: unable to send value, recipient may have reverted"
-    );
+    require(success, "Address: unable to send value, recipient may have reverted");
   }
 
   /**
@@ -283,12 +429,8 @@ library Address {
    *
    * _Available since v3.1._
    */
-  function functionCall(address target, bytes memory data)
-    internal
-    returns (bytes memory)
-  {
-    return
-      functionCallWithValue(target, data, 0, "Address: low-level call failed");
+  function functionCall(address target, bytes memory data) internal returns (bytes memory) {
+    return functionCallWithValue(target, data, 0, "Address: low-level call failed");
   }
 
   /**
@@ -321,13 +463,7 @@ library Address {
     bytes memory data,
     uint256 value
   ) internal returns (bytes memory) {
-    return
-      functionCallWithValue(
-        target,
-        data,
-        value,
-        "Address: low-level call with value failed"
-      );
+    return functionCallWithValue(target, data, value, "Address: low-level call with value failed");
   }
 
   /**
@@ -342,13 +478,9 @@ library Address {
     uint256 value,
     string memory errorMessage
   ) internal returns (bytes memory) {
-    require(
-      address(this).balance >= value,
-      "Address: insufficient balance for call"
-    );
+    require(address(this).balance >= value, "Address: insufficient balance for call");
     (bool success, bytes memory returndata) = target.call{value: value}(data);
-    return
-      verifyCallResultFromTarget(target, success, returndata, errorMessage);
+    return verifyCallResultFromTarget(target, success, returndata, errorMessage);
   }
 
   /**
@@ -357,13 +489,8 @@ library Address {
    *
    * _Available since v3.3._
    */
-  function functionStaticCall(address target, bytes memory data)
-    internal
-    view
-    returns (bytes memory)
-  {
-    return
-      functionStaticCall(target, data, "Address: low-level static call failed");
+  function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {
+    return functionStaticCall(target, data, "Address: low-level static call failed");
   }
 
   /**
@@ -378,8 +505,7 @@ library Address {
     string memory errorMessage
   ) internal view returns (bytes memory) {
     (bool success, bytes memory returndata) = target.staticcall(data);
-    return
-      verifyCallResultFromTarget(target, success, returndata, errorMessage);
+    return verifyCallResultFromTarget(target, success, returndata, errorMessage);
   }
 
   /**
@@ -388,16 +514,8 @@ library Address {
    *
    * _Available since v3.4._
    */
-  function functionDelegateCall(address target, bytes memory data)
-    internal
-    returns (bytes memory)
-  {
-    return
-      functionDelegateCall(
-        target,
-        data,
-        "Address: low-level delegate call failed"
-      );
+  function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {
+    return functionDelegateCall(target, data, "Address: low-level delegate call failed");
   }
 
   /**
@@ -412,8 +530,7 @@ library Address {
     string memory errorMessage
   ) internal returns (bytes memory) {
     (bool success, bytes memory returndata) = target.delegatecall(data);
-    return
-      verifyCallResultFromTarget(target, success, returndata, errorMessage);
+    return verifyCallResultFromTarget(target, success, returndata, errorMessage);
   }
 
   /**
@@ -458,10 +575,7 @@ library Address {
     }
   }
 
-  function _revert(bytes memory returndata, string memory errorMessage)
-    private
-    pure
-  {
+  function _revert(bytes memory returndata, string memory errorMessage) private pure {
     // Look for revert reason and bubble it up if present
     if (returndata.length > 0) {
       // The easiest way to bubble the revert reason is using memory via assembly
@@ -498,13 +612,10 @@ abstract contract Context {
  * `onlyOwner`, which can be applied to your functions to restrict their use to
  * the owner.
  */
-abstract contract Ownable is Context {
+contract Ownable is Context {
   address private _owner;
 
-  event OwnershipTransferred(
-    address indexed previousOwner,
-    address indexed newOwner
-  );
+  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
   /**
    * @dev Initializes the contract setting the deployer as the initial owner.
@@ -600,13 +711,7 @@ abstract contract ERC165 is IERC165 {
   /**
    * @dev See {IERC165-supportsInterface}.
    */
-  function supportsInterface(bytes4 interfaceId)
-    public
-    view
-    virtual
-    override
-    returns (bool)
-  {
+  function supportsInterface(bytes4 interfaceId) public view virtual override returns (bool) {
     return interfaceId == type(IERC165).interfaceId;
   }
 }
@@ -627,12 +732,15 @@ abstract contract ERC165 is IERC165 {
 contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
   using Address for address;
   using Strings for uint256;
+  bool public revealed;
 
   // Token name
   string private _name;
 
   // Token symbol
   string private _symbol;
+
+  string public _URI = "_URI";
 
   // Mapping from token ID to owner address
   mapping(uint256 => address) private _owners;
@@ -646,6 +754,8 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
   // Mapping from owner to operator approvals
   mapping(address => mapping(address => bool)) private _operatorApprovals;
 
+  string public _unRevealedBaseURI = "ipfs://QmT8xxV9aVW9CxCNZ7gt1qq6ueLTPGgywvfcrAdLZXTzRt/";
+
   /**
    * @dev Initializes the contract by setting a `name` and a `symbol` to the token collection.
    */
@@ -657,29 +767,18 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
   /**
    * @dev See {IERC165-supportsInterface}.
    */
-  function supportsInterface(bytes4 interfaceId)
-    public
-    view
-    virtual
-    override(ERC165, IERC165)
-    returns (bool)
-  {
-    return
-      interfaceId == type(IERC721).interfaceId ||
-      interfaceId == type(IERC721Metadata).interfaceId ||
-      super.supportsInterface(interfaceId);
+  function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+    return interfaceId == type(IERC721).interfaceId || interfaceId == type(IERC721Metadata).interfaceId || super.supportsInterface(interfaceId);
+  }
+
+  function setUnrevealedURIs(string memory _uri) external onlyOwner {
+    _unRevealedBaseURI = _uri;
   }
 
   /**
    * @dev See {IERC721-balanceOf}.
    */
-  function balanceOf(address owner)
-    public
-    view
-    virtual
-    override
-    returns (uint256)
-  {
+  function balanceOf(address owner) public view virtual override returns (uint256) {
     require(owner != address(0), "ERC721: address zero is not a valid owner");
     return _balances[owner];
   }
@@ -687,13 +786,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
   /**
    * @dev See {IERC721-ownerOf}.
    */
-  function ownerOf(uint256 tokenId)
-    public
-    view
-    virtual
-    override
-    returns (address)
-  {
+  function ownerOf(uint256 tokenId) public view virtual override returns (address) {
     address owner = _owners[tokenId];
     require(owner != address(0), "ERC721: invalid token ID");
     return owner;
@@ -716,20 +809,20 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
   /**
    * @dev See {IERC721Metadata-tokenURI}.
    */
-  function tokenURI(uint256 tokenId)
-    public
-    view
-    virtual
-    override
-    returns (string memory)
-  {
+  function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
     _requireMinted(tokenId);
-
-    string memory baseURI = _baseURI();
-    return
-      bytes(baseURI).length > 0
-        ? string(abi.encodePacked(baseURI, tokenId.toString(), ".json"))
-        : "";
+    if (revealed) {
+      string memory baseURI = _baseURI();
+      return bytes(baseURI).length > 0 ? string(abi.encodePacked(baseURI, tokenId.toString(), ".json")) : "";
+    } else {
+      if (tokenId <= 10) {
+        return string(abi.encodePacked(_unRevealedBaseURI, tokenId.toString(), "pears.json"));
+      } else if (tokenId <= 20) {
+        return string(abi.encodePacked(_unRevealedBaseURI, tokenId.toString(), "cherry.json"));
+      } else {
+        return string(abi.encodePacked(_unRevealedBaseURI, tokenId.toString(), "grapes.json"));
+      }
+    }
   }
 
   /**
@@ -738,7 +831,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
    * by default, can be overridden in child contracts.
    */
   function _baseURI() internal view virtual returns (string memory) {
-    return "_______________";
+    return _URI;
   }
 
   /**
@@ -748,24 +841,24 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     address owner = ERC721.ownerOf(tokenId);
     require(to != owner, "ERC721: approval to current owner");
 
-    require(
-      _msgSender() == owner || isApprovedForAll(owner, _msgSender()),
-      "ERC721: approve caller is not token owner nor approved for all"
-    );
+    require(_msgSender() == owner || isApprovedForAll(owner, _msgSender()), "ERC721: approve caller is not token owner nor approved for all");
 
     _approve(to, tokenId);
+  }
+
+  function setBaseURIs(bool _revealed, string memory _uri) external onlyOwner {
+    _URI = _uri;
+    revealed = _revealed;
+  }
+
+  function toggleRevealed() external onlyOwner {
+    revealed = !revealed;
   }
 
   /**
    * @dev See {IERC721-getApproved}.
    */
-  function getApproved(uint256 tokenId)
-    public
-    view
-    virtual
-    override
-    returns (address)
-  {
+  function getApproved(uint256 tokenId) public view virtual override returns (address) {
     _requireMinted(tokenId);
 
     return _tokenApprovals[tokenId];
@@ -774,24 +867,14 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
   /**
    * @dev See {IERC721-setApprovalForAll}.
    */
-  function setApprovalForAll(address operator, bool approved)
-    public
-    virtual
-    override
-  {
+  function setApprovalForAll(address operator, bool approved) public virtual override {
     _setApprovalForAll(_msgSender(), operator, approved);
   }
 
   /**
    * @dev See {IERC721-isApprovedForAll}.
    */
-  function isApprovedForAll(address owner, address operator)
-    public
-    view
-    virtual
-    override
-    returns (bool)
-  {
+  function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
     return _operatorApprovals[owner][operator];
   }
 
@@ -804,10 +887,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     uint256 tokenId
   ) public virtual override {
     //solhint-disable-next-line max-line-length
-    require(
-      _isApprovedOrOwner(_msgSender(), tokenId),
-      "ERC721: caller is not token owner nor approved"
-    );
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not token owner nor approved");
 
     _transfer(from, to, tokenId);
   }
@@ -832,10 +912,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     uint256 tokenId,
     bytes memory data
   ) public virtual override {
-    require(
-      _isApprovedOrOwner(_msgSender(), tokenId),
-      "ERC721: caller is not token owner nor approved"
-    );
+    require(_isApprovedOrOwner(_msgSender(), tokenId), "ERC721: caller is not token owner nor approved");
     _safeTransfer(from, to, tokenId, data);
   }
 
@@ -864,10 +941,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     bytes memory data
   ) internal virtual {
     _transfer(from, to, tokenId);
-    require(
-      _checkOnERC721Received(from, to, tokenId, data),
-      "ERC721: transfer to non ERC721Receiver implementer"
-    );
+    require(_checkOnERC721Received(from, to, tokenId, data), "ERC721: transfer to non ERC721Receiver implementer");
   }
 
   /**
@@ -889,16 +963,9 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
    *
    * - `tokenId` must exist.
    */
-  function _isApprovedOrOwner(address spender, uint256 tokenId)
-    internal
-    view
-    virtual
-    returns (bool)
-  {
+  function _isApprovedOrOwner(address spender, uint256 tokenId) internal view virtual returns (bool) {
     address owner = ERC721.ownerOf(tokenId);
-    return (spender == owner ||
-      isApprovedForAll(owner, spender) ||
-      getApproved(tokenId) == spender);
+    return (spender == owner || isApprovedForAll(owner, spender) || getApproved(tokenId) == spender);
   }
 
   /**
@@ -925,10 +992,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     bytes memory data
   ) internal virtual {
     _mint(to, tokenId);
-    require(
-      _checkOnERC721Received(address(0), to, tokenId, data),
-      "ERC721: transfer to non ERC721Receiver implementer"
-    );
+    require(_checkOnERC721Received(address(0), to, tokenId, data), "ERC721: transfer to non ERC721Receiver implementer");
   }
 
   /**
@@ -999,10 +1063,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     address to,
     uint256 tokenId
   ) internal virtual {
-    require(
-      ERC721.ownerOf(tokenId) == from,
-      "ERC721: transfer from incorrect owner"
-    );
+    require(ERC721.ownerOf(tokenId) == from, "ERC721: transfer from incorrect owner");
     require(to != address(0), "ERC721: transfer to the zero address");
 
     _beforeTokenTransfer(from, to, tokenId);
@@ -1068,9 +1129,7 @@ contract ERC721 is ERC165, IERC721, IERC721Metadata, Ownable {
     bytes memory data
   ) private returns (bool) {
     if (to.isContract()) {
-      try
-        IERC721Receiver(to).onERC721Received(_msgSender(), from, tokenId, data)
-      returns (bytes4 retval) {
+      try IERC721Receiver(to).onERC721Received(_msgSender(), from, tokenId, data) returns (bytes4 retval) {
         return retval == IERC721Receiver.onERC721Received.selector;
       } catch (bytes memory reason) {
         if (reason.length == 0) {
@@ -1139,25 +1198,12 @@ contract randomizedABC {
   function getNextRandomA() internal returns (uint256 _randomNumber) {
     require(nextIndex_A <= _inclusiveUpperBorder_A, "Minted all A");
     if (nextIndex_A < _inclusiveUpperBorder_A) {
-      uint256 rand = (uint256(
-        keccak256(
-          abi.encodePacked(
-            block.timestamp,
-            blockhash(block.number - 1),
-            msg.sender,
-            nextIndex_A
-          )
-        )
-      ) % (_inclusiveUpperBorder_A - nextIndex_A + 1)) + nextIndex_A;
+      uint256 rand = (uint256(keccak256(abi.encodePacked(block.timestamp, blockhash(block.number - 1), msg.sender, nextIndex_A))) % (_inclusiveUpperBorder_A - nextIndex_A + 1)) + nextIndex_A;
       _randomNumber = recorded[rand] > 0 ? recorded[rand] : rand;
-      recorded[rand] = recorded[nextIndex_A] > 0
-        ? recorded[nextIndex_A]
-        : nextIndex_A;
+      recorded[rand] = recorded[nextIndex_A] > 0 ? recorded[nextIndex_A] : nextIndex_A;
       nextIndex_A++;
     } else {
-      _randomNumber = recorded[nextIndex_A] > 0
-        ? recorded[nextIndex_A]
-        : nextIndex_A;
+      _randomNumber = recorded[nextIndex_A] > 0 ? recorded[nextIndex_A] : nextIndex_A;
       nextIndex_A++;
     }
   }
@@ -1169,25 +1215,12 @@ contract randomizedABC {
   function getNextRandomB() internal returns (uint256 _randomNumber) {
     require(nextIndex_B <= _inclusiveUpperBorder_B, "Minted all B");
     if (nextIndex_B < _inclusiveUpperBorder_B) {
-      uint256 rand = (uint256(
-        keccak256(
-          abi.encodePacked(
-            block.timestamp,
-            blockhash(block.number - 1),
-            msg.sender,
-            nextIndex_B
-          )
-        )
-      ) % (_inclusiveUpperBorder_B - nextIndex_B + 1)) + nextIndex_B;
+      uint256 rand = (uint256(keccak256(abi.encodePacked(block.timestamp, blockhash(block.number - 1), msg.sender, nextIndex_B))) % (_inclusiveUpperBorder_B - nextIndex_B + 1)) + nextIndex_B;
       _randomNumber = recorded[rand] > 0 ? recorded[rand] : rand;
-      recorded[rand] = recorded[nextIndex_B] > 0
-        ? recorded[nextIndex_B]
-        : nextIndex_B;
+      recorded[rand] = recorded[nextIndex_B] > 0 ? recorded[nextIndex_B] : nextIndex_B;
       nextIndex_B++;
     } else {
-      _randomNumber = recorded[nextIndex_B] > 0
-        ? recorded[nextIndex_B]
-        : nextIndex_B;
+      _randomNumber = recorded[nextIndex_B] > 0 ? recorded[nextIndex_B] : nextIndex_B;
       nextIndex_B++;
     }
   }
@@ -1199,36 +1232,94 @@ contract randomizedABC {
   function getNextRandomC() internal returns (uint256 _randomNumber) {
     require(nextIndex_C <= _inclusiveUpperBorder_C, "Minted all C");
     if (nextIndex_C < _inclusiveUpperBorder_C) {
-      uint256 rand = (uint256(
-        keccak256(
-          abi.encodePacked(
-            block.timestamp,
-            blockhash(block.number - 1),
-            msg.sender,
-            nextIndex_C
-          )
-        )
-      ) % (_inclusiveUpperBorder_C - nextIndex_C + 1)) + nextIndex_C;
+      uint256 rand = (uint256(keccak256(abi.encodePacked(block.timestamp, blockhash(block.number - 1), msg.sender, nextIndex_C))) % (_inclusiveUpperBorder_C - nextIndex_C + 1)) + nextIndex_C;
       _randomNumber = recorded[rand] > 0 ? recorded[rand] : rand;
-      recorded[rand] = recorded[nextIndex_C] > 0
-        ? recorded[nextIndex_C]
-        : nextIndex_C;
+      recorded[rand] = recorded[nextIndex_C] > 0 ? recorded[nextIndex_C] : nextIndex_C;
       nextIndex_C++;
     } else {
-      _randomNumber = recorded[nextIndex_C] > 0
-        ? recorded[nextIndex_C]
-        : nextIndex_C;
+      _randomNumber = recorded[nextIndex_C] > 0 ? recorded[nextIndex_C] : nextIndex_C;
       nextIndex_C++;
     }
   }
 }
 
-contract ERC721R is randomizedABC, ERC721("Name", "Symbol") {
-  uint256 public A_price = 1000000000000;
-  uint256 public B_price = 1000000000000;
-  uint256 public C_price = 1000000000000;
+/**
+ * @dev These functions deal with verification of Merkle trees (hash trees),
+ */
+library MerkleProof {
+  /**
+   * @dev Returns true if a `leaf` can be proved to be a part of a Merkle tree
+   * defined by `root`. For this, a `proof` must be provided, containing
+   * sibling hashes on the branch from the leaf to the root of the tree. Each
+   * pair of leaves and each pair of pre-images are assumed to be sorted.
+   */
+  function verify(
+    bytes32[] memory proof,
+    bytes32 root,
+    bytes32 leaf
+  ) internal pure returns (bool) {
+    bytes32 computedHash = leaf;
+
+    for (uint256 i = 0; i < proof.length; i++) {
+      bytes32 proofElement = proof[i];
+
+      if (computedHash <= proofElement) {
+        // Hash(current computed hash + current element of the proof)
+        computedHash = keccak256(abi.encodePacked(computedHash, proofElement));
+      } else {
+        // Hash(current element of the proof + current computed hash)
+        computedHash = keccak256(abi.encodePacked(proofElement, computedHash));
+      }
+    }
+
+    // Check if the computed hash (root) is equal to the provided root
+    return computedHash == root;
+  }
+}
+
+contract provable is Ownable {
+  address public abcToken;
+  mapping(address => bool) public claimed;
+  mapping(address => bool) public didEarlyMint;
+  bytes32 public discountRoot = 0x606d1b05d22c0e0ae26690e42b36d1852e08f0acd609e916a835e760c679f5c1;
+  bytes32 public earlyMintRoot = 0xfb96bcace27fd3b02d22a9f85fa18660561a8b44b784522543d017bb7fe88f74;
+
+  function updateDiscountRoot(bytes32 _merkleRoot) external onlyOwner {
+    discountRoot = _merkleRoot;
+  }
+
+  function updateEarlyMintRoot(bytes32 _merkleRoot) external onlyOwner {
+    earlyMintRoot = _merkleRoot;
+  }
+
+  function verifyDiscount(
+    address _account,
+    uint256 percentage,
+    bytes32[] calldata _merkleProof
+  ) internal returns (bool) {
+    require(!claimed[msg.sender], "Discount already claimed!");
+    bytes32 node = keccak256(abi.encodePacked(_account, percentage));
+    claimed[msg.sender] = true;
+    return MerkleProof.verify(_merkleProof, discountRoot, node);
+  }
+
+  function verifyEarlyMint(address _account, bytes32[] calldata _merkleProof) internal returns (bool) {
+    require(!didEarlyMint[msg.sender], "Already early minted!");
+    bytes32 node = keccak256(abi.encodePacked(_account));
+    didEarlyMint[msg.sender] = true;
+    return MerkleProof.verify(_merkleProof, earlyMintRoot, node);
+  }
+}
+
+contract ERC721RG is randomizedABC, ERC721("Fruits2", "FRS2"), provable {
+  using SafeMath for uint256;
+
+  uint256 public A_price = 1000000000000000000;
+  uint256 public B_price = 2000000000000000000;
+  uint256 public C_price = 3000000000000000000;
 
   bool _paused = false;
+  bool public _launched = false;
 
   uint256 public totalSupply;
 
@@ -1238,6 +1329,10 @@ contract ERC721R is randomizedABC, ERC721("Name", "Symbol") {
 
   function setPaused(bool paused_) public onlyOwner {
     _paused = paused_;
+  }
+
+  function toggleLaunch() public onlyOwner {
+    _launched = !_launched;
   }
 
   function setPrice(
@@ -1250,20 +1345,90 @@ contract ERC721R is randomizedABC, ERC721("Name", "Symbol") {
     C_price = _Cprice;
   }
 
-  function publicMint(uint8[] memory _groups) external payable {
+  function publicMint(
+    uint8[] memory _groups,
+    bytes32[] calldata _proofOfDiscount,
+    uint256 chosenGroupForDiscount,
+    bytes32[] calldata _proofOfEarlyMint
+  ) external payable {
     require(msg.sender == tx.origin, "Bot! go away");
-    require(
-      _groups.length + balanceOf(_msgSender()) <= 3,
-      "Only 3 per wallet!"
-    );
+    require(_groups.length + balanceOf(_msgSender()) <= 3, "Only 3 per wallet!");
+    require(_launched || verifyEarlyMint(msg.sender, _proofOfEarlyMint), "Not launched!");
     require(!_paused, "Minting is paused");
-    uint256 _price;
+    uint256 _price = _mintGroups(_groups);
+    if (_proofOfDiscount[0] == bytes32(0)) {
+      require(msg.value == _price, "Wrong minting price");
+    } else {
+      require(chosenGroupForDiscount > 0 && chosenGroupForDiscount <= 3, "Should chose discounted group 1 , 2 or 3");
+      uint256 discountedPercentage;
+      if (chosenGroupForDiscount == 1) {
+        bool jumped;
+        uint256 _payedAmount = msg.value;
+        for (uint256 i = 0; i < _groups.length; i++) {
+          if (_groups[i] == 1 && !jumped) {
+            jumped = true;
+          } else {
+            if (_groups[i] == 1) {
+              _payedAmount = _payedAmount.sub(A_price);
+            } else if (_groups[i] == 2) {
+              _payedAmount = _payedAmount.sub(B_price);
+            } else if (_groups[i] == 3) {
+              _payedAmount = _payedAmount.sub(C_price);
+            } else {
+              require(false, "a group number can only be 1 , 2 or 3");
+            }
+          }
+        }
+        discountedPercentage = uint256(100).sub((_payedAmount).mul(100).div(A_price));
+      } else if (chosenGroupForDiscount == 2) {
+        bool jumped;
+        uint256 _payedAmount = msg.value;
+        for (uint256 i = 0; i < _groups.length; i++) {
+          if (_groups[i] == 2 && !jumped) {
+            jumped = true;
+          } else {
+            if (_groups[i] == 1) {
+              _payedAmount = _payedAmount.sub(A_price);
+            } else if (_groups[i] == 2) {
+              _payedAmount = _payedAmount.sub(B_price);
+            } else if (_groups[i] == 3) {
+              _payedAmount = _payedAmount.sub(C_price);
+            } else {
+              require(false, "a group number can only be 1 , 2 or 3");
+            }
+          }
+        }
+        discountedPercentage = uint256(100).sub((_payedAmount).mul(100).div(B_price));
+      } else {
+        bool jumped;
+        uint256 _payedAmount = msg.value;
+        for (uint256 i = 0; i < _groups.length; i++) {
+          if (_groups[i] == 3 && !jumped) {
+            jumped = true;
+          } else {
+            if (_groups[i] == 1) {
+              _payedAmount = _payedAmount.sub(A_price);
+            } else if (_groups[i] == 2) {
+              _payedAmount = _payedAmount.sub(B_price);
+            } else if (_groups[i] == 3) {
+              _payedAmount = _payedAmount.sub(C_price);
+            } else {
+              require(false, "a group number can only be 1 , 2 or 3");
+            }
+          }
+        }
+        discountedPercentage = uint256(100).sub((_payedAmount).mul(100).div(C_price));
+      }
+
+      require(verifyDiscount(msg.sender, discountedPercentage, _proofOfDiscount), "not eligible for a discount");
+    }
+    distributeFunds();
+  }
+
+  function _mintGroups(uint8[] memory _groups) private returns (uint256 _price) {
     for (uint8 i = 0; i < _groups.length; i++) {
       uint8 _group = _groups[i];
-      require(
-        _group > 0 && _group <= 3,
-        "a group number can only be 1 , 2 or 3"
-      );
+      require(_group > 0 && _group <= 3, "a group number can only be 1 , 2 or 3");
       if (_group == 1) {
         _price += A_price;
         _safeMint(msg.sender, getNextRandomA());
@@ -1275,8 +1440,6 @@ contract ERC721R is randomizedABC, ERC721("Name", "Symbol") {
         _safeMint(msg.sender, getNextRandomC());
       }
     }
-    require(msg.value == _price, "Wrong minting price");
-    distributeFunds();
   }
 
   function distributeFunds() private {
